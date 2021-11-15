@@ -1,0 +1,25 @@
+{
+  "name": "remote-display-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blewert/remote-display-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blewert/remote-display-server/issues"
+  },
+  "homepage": "https://github.com/blewert/remote-display-server#readme",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "keypress": "^0.2.1",
+    "ws": "^8.2.3"
+  }
+}
