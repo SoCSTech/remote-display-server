@@ -1,6 +1,10 @@
+//Firstly import settings
+const settings = require('./config/settings.json'); 
+
 const { WebSocketServer } = require('ws');
 const crypto = require("crypto");
 const keypress = require("keypress");
+const { initPing, defaultPingHandler } = require("./src/ping"); 
 
 function heartbeat() 
 {
@@ -12,30 +16,10 @@ keypress(process.stdin);
 
 var lastChar = " ";
 
-const wss = new WebSocketServer({ port: 1213 });
+let wss = new WebSocketServer({ port: settings.hostPort });
 
-wss.on('connection', function connection(ws) 
-{
-    console.log("connection");
+initPing(wss, defaultPingHandler);
 
-    ws.isAlive = true;
-    ws.on('pong', heartbeat);
-});
-
-const interval = setInterval(function ping()
-{
-    wss.clients.forEach(function each(ws) 
-    {
-        if (ws.isAlive === false)
-        {
-            console.log("no response. terminating");
-            return ws.terminate();
-        }
-
-        ws.isAlive = false;
-        ws.ping();
-    });
-}, 10000);
 
 const dataSendInterval = setInterval(function () 
 {
@@ -49,10 +33,7 @@ const dataSendInterval = setInterval(function ()
     })
 }, 500);
 
-wss.on('close', function close() 
-{
-    clearInterval(interval);
-});
+
 
 process.stdin.setRawMode(true);
 
