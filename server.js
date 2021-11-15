@@ -3,8 +3,9 @@ const settings = require('./config/settings.json');
 
 const { WebSocketServer } = require('ws');
 const crypto = require("crypto");
-const keypress = require("keypress");
+
 const { initPing, defaultPingHandler } = require("./src/ping"); 
+const { initKeypresses, defaultKeypressHandler } = require('./src/keypresses');
 
 function heartbeat() 
 {
@@ -12,14 +13,13 @@ function heartbeat()
     this.isAlive = true;
 }
 
-keypress(process.stdin);
 
 var lastChar = " ";
 
 let wss = new WebSocketServer({ port: settings.hostPort });
 
 initPing(wss, defaultPingHandler);
-
+initKeypresses(wss, defaultKeypressHandler);
 
 const dataSendInterval = setInterval(function () 
 {
@@ -32,15 +32,3 @@ const dataSendInterval = setInterval(function ()
         }));
     })
 }, 500);
-
-
-
-process.stdin.setRawMode(true);
-
-process.stdin.on("keypress", function (ch, key) 
-{    
-    lastChar = ch;
-
-    if (ch == "q")
-        process.exit(1);
-});
