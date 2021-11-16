@@ -45,7 +45,7 @@ module.exports =
             ws.terminate();
         }
 
-        if(req.headers("authtoken") != settings.authorisationToken)
+        if(req.headers["authtoken"] != settings.authorisationToken)
         {
             //No displayid passed! Get out of here! 
             logger.error(`Client ${ws._socket.remoteAddress} failed authentication. Terminating.`);
