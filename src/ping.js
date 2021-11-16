@@ -1,4 +1,5 @@
 const settings = require('../config/settings.json');
+const logging = require('./logging');
 
 /**
  * Initialises a web socket server with keep alive / ping-pong
@@ -18,7 +19,7 @@ function initPing(wss, cb)
         ws.isAlive = true;
 
         //Call ping function
-        ws.on('pong', cb);
+        ws.on('pong', () => cb(wss, ws));
     });
 
     //Set up an interval: ping every client every X seconds
@@ -32,9 +33,9 @@ function initPing(wss, cb)
             //then terminate it
             //..
 
-            if (ws.isAlive === false) 
+            if (ws.isAlive == false) 
             {
-                console.log("no response. terminating");
+                logging.sendClientTerminatedMessage(ws, logging.terminationReasons.timeout);
                 return ws.terminate();
             }
 
@@ -42,6 +43,10 @@ function initPing(wss, cb)
             ws.isAlive = false;
             ws.ping();
         });
+
+        if(wss.clients.size > 0)
+            logging.sendPingSentMessage(wss);
+
     }, settings.pingInterval);
 
 
@@ -63,10 +68,13 @@ function initPing(wss, cb)
  * 
  * @param {*} wss 
  */
-function defaultPingHandler(wss)
+function defaultPingHandler(wss, ws)
 {
+    //Call ping log function
+    logging.sendPingReceivedMessage(ws);
+
     //Set alive to true
-    wss.isAlive = true;
+    ws.isAlive = true;
 }
 
 module.exports = { initPing, defaultPingHandler }
