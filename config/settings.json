@@ -4,5 +4,9 @@
     "logging": {
         "level": "debug"
     },
-    "authorisationToken": "password"
+    "authorisationToken": "password",
+    "carousel": {
+        "operationMode": "synchronised",
+        "updateInterval": 500
+    }
 }

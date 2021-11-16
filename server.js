@@ -17,14 +17,16 @@ const { sendWelcomeMessage } = require('./src/utils/logging');
 //Import behaviour
 const carousel = require("./src/behaviours/carousel");
 
-
-//Send warnings if needed
-if (settings.authorisationToken == "password") 
+function checkForWarnings()
 {
-    // console.clear();
-    console.log(chalk.red.bold("WARNING"))
-    console.log(chalk.red.bold("The specified authorisation token has not been changed. It is advised that you change this immediately for security purposes."));
-    console.log("");
+    //Send warnings if needed
+    if (settings.authorisationToken == "password") 
+    {
+        // console.clear();
+        console.log(chalk.red.bold("WARNING"))
+        console.log(chalk.red.bold("The specified authorisation token has not been changed. It is advised that you change this immediately for security purposes."));
+        console.log("");
+    }
 }
 
 
@@ -33,6 +35,9 @@ function start()
     //Initialise logging and send welcome message
     logging.initialise();
     logging.sendWelcomeMessage();
+
+    //Check for config warnings
+    checkForWarnings();
 
     //Make a new server
     let wss = new WebSocketServer({ port: settings.hostPort });

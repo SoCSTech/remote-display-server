@@ -1,6 +1,7 @@
 const logger = require("winston");
 const packageDetails = require("../../package.json");
 const settings = require("../../config/settings.json");
+const chalk = require("chalk");
 
 const Logging = 
 {
@@ -82,14 +83,15 @@ const Logging =
     sendWelcomeMessage()
     {
         logger.info("");
-        logger.info(`${packageDetails.name} ${packageDetails.version}`);
-        logger.info(`${packageDetails.description}`);
+        logger.info(`${packageDetails.name}`);
+        logger.info(`(server version ${packageDetails.version})`);
         logger.info("");
-        logger.info(`Authored by ${packageDetails.author}`);
+        logger.info(chalk.gray(`${packageDetails.description}`));
+        logger.info(chalk.gray(`Authored by ${packageDetails.author}`));
         logger.info("");
-        logger.info("----------------------------");
-        logger.info("Press q at any point to exit");
-        logger.info("----------------------------");
+        logger.info(chalk.gray("----------------------------"));
+        logger.info(chalk.dim(`Press ${chalk.yellow("q")} at any point to exit`));
+        logger.info(chalk.gray("----------------------------"));
         logger.info("");
     }
 }

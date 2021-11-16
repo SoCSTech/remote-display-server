@@ -1,6 +1,57 @@
 const logger = require("winston");
 const carouselData = require("../../config/carousel.json");
 const settings = require("../../config/settings.json");
+const chalk = require("chalk");
+
+const carouselOperationModes = [
+    {
+        key: "random",
+        handler: (ws, ctx) =>
+        {
+            //Find new random id
+            const randomID = Math.floor(Math.random() * carouselData.length);
+
+            //Get slide data
+            const data = carouselData[randomID];
+
+            //And send it to the display
+            ws.send(JSON.stringify(data));
+
+            logger.debug(`[send] Sent slide ${randomID} to display ${ws.displayID}`);
+        }
+    },
+    
+    {
+        key: "synchronised",
+        handler: (ws, ctx) =>
+        {
+            //Get slide data
+            const data = carouselData[ctx.slideIndex];
+
+            //And send it to the display
+            ws.send(JSON.stringify(data));
+
+            logger.debug(`[send] Sent slide ${ctx.slideIndex} to display ${ws.displayID}`);
+        }
+    },
+
+    {
+        key: "sequential",
+        handler: (ws, ctx) =>
+        {
+            //Offset by this client's ID
+            const thisClientIndex = (ctx.slideIndex + ws.displayID) % carouselData.length;
+
+            //Get slide data
+            const data = carouselData[thisClientIndex];
+
+            //And send it to the display
+            ws.send(JSON.stringify(data));
+
+            logger.debug(`[send] Sent slide ${thisClientIndex} to display ${ws.displayID}`);
+        }
+    }
+]
 
 module.exports = 
 {
@@ -8,7 +59,7 @@ module.exports =
     {
         //Set web socket server
         this.wss = wss;
-        this.interval = setInterval(this.update.bind(this), 500);
+        this.interval = setInterval(this.update.bind(this), settings.carousel.updateInterval);
 
         //Add close event
         this.wss.on('close', (() => this.close(this.wss)).bind(this));
@@ -21,6 +72,15 @@ module.exports =
 
         //Set client id to 0
         this.newClientID = 0;
+
+        if (!carouselOperationModes.some(x => x.key == settings.carousel.operationMode)) 
+        {
+            logger.warn(chalk.red(`Warning: Invalid carousel operation mode '${settings.carousel.operationMode}', expected one of: ${carouselOperationModes.map(x => x.key)}`));
+            return;
+        }
+        
+        //Otherwise display message 
+        logger.debug(`Initialised carousel in mode '${settings.carousel.operationMode}'`);
     },
 
     onConnect(ws, req)
@@ -79,25 +139,24 @@ module.exports =
 
     update()
     {
-        //Compute new slide index
+        //Invalid operation mode? Get out of here bro
+        if (!carouselOperationModes.some(x => x.key == settings.carousel.operationMode)) 
+            return;
+
+        //Otherwise, find the operation mode handler
+        const handlerFunc = carouselOperationModes.find(x => x.key == settings.carousel.operationMode).handler;
+
+        //Compute new slide index for some modes
         this.slideIndex = (this.slideIndex + 1) % carouselData.length;
         
         //Save this to ctx
         const ctx = this;
 
-        this.wss.clients.forEach((ws, index) => 
+        //Just run handler func on every clint
+        this.wss.clients.forEach((ws) =>
         {
-            //Offset by this client's ID
-            const thisClientIndex = (ctx.slideIndex + ws.displayID) % carouselData.length;
-
-            //Get slide data
-            const data = carouselData[thisClientIndex];
-
-            //And send it to the display
-            ws.send(JSON.stringify(data));
-
-            logger.debug(`[send] Send slide ${thisClientIndex} to display ${ws.displayID}`);
-        })
+            handlerFunc(ws, ctx);
+        });
     },
 
     close(wss)
