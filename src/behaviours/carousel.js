@@ -28,9 +28,6 @@ module.exports =
         //Set disconnect
         ws.on('close', ((ws) => this.onDisconnect(ws)).bind(this));
 
-        //Set client index
-        ws.carouselIndex = this.newClientID++;
-
         if(!("displayid" in req.headers))
         {
             //No displayid passed! Get out of here! 
@@ -40,17 +37,39 @@ module.exports =
 
         if (!("authtoken" in req.headers)) 
         {
-            //No displayid passed! Get out of here! 
+            //No authtoken passed! Get out of here! 
             logger.error(`Client ${ws._socket.remoteAddress} tried to connect without passing any authorisation details. Terminating.`);
             ws.terminate();
         }
 
         if(req.headers["authtoken"] != settings.authorisationToken)
         {
-            //No displayid passed! Get out of here! 
+            //Invalid authorisation token
             logger.error(`Client ${ws._socket.remoteAddress} failed authentication. Terminating.`);
             ws.terminate();
         }
+
+        //Check to see if displayid is valid
+        //..
+
+        const displayIDStr = req.headers["displayid"];
+        const displayID = parseInt(displayIDStr);
+
+        if(isNaN(displayID))
+        {
+            //Invalid authorisation token
+            logger.error(`Client ${ws._socket.remoteAddress} tried connecting with invalid displayID ${displayIDStr}. Must be an integer. Terminating.`);
+            ws.terminate();
+        }
+
+        if ([...this.wss.clients].some(x => x.displayID == displayID))
+        {
+            //Invalid authorisation token
+            logger.error(`Client ${ws._socket.remoteAddress} tried connecting with displayID ${displayIDStr}, but it already exists. Terminating.`);
+            ws.terminate();
+        }
+
+        ws.displayID = displayID;
     },
 
     onDisconnect(ws)
@@ -69,7 +88,7 @@ module.exports =
         this.wss.clients.forEach((ws, index) => 
         {
             //Offset by this client's ID
-            const thisClientIndex = (this.slideIndex + ws.carouselIndex) % carouselData.length;
+            const thisClientIndex = (ctx.slideIndex + ws.displayID) % carouselData.length;
 
             //Get slide data
             const data = carouselData[thisClientIndex];
@@ -77,7 +96,7 @@ module.exports =
             //And send it to the display
             ws.send(JSON.stringify(data));
 
-            logger.debug(`[send] Send slide ${thisClientIndex} to client ${ws.carouselIndex}`);
+            logger.debug(`[send] Send slide ${thisClientIndex} to display ${ws.displayID}`);
         })
     },
 
