@@ -1,5 +1,6 @@
 const logger = require("winston");
 const carouselData = require("../../config/carousel.json");
+const settings = require("../../config/settings.json");
 
 module.exports = 
 {
@@ -13,7 +14,7 @@ module.exports =
         this.wss.on('close', (() => this.close(this.wss)).bind(this));
 
         //Call onConnect callback when connected
-        this.wss.on('connection', ((ws) => this.onConnect(ws)).bind(this));
+        this.wss.on('connection', ((ws, req) => this.onConnect(ws, req)).bind(this));
 
         //Slide index
         this.slideIndex = 0;
@@ -22,7 +23,7 @@ module.exports =
         this.newClientID = 0;
     },
 
-    onConnect(ws)
+    onConnect(ws, req)
     {
         //Set disconnect
         ws.on('close', ((ws) => this.onDisconnect(ws)).bind(this));
@@ -30,7 +31,26 @@ module.exports =
         //Set client index
         ws.carouselIndex = this.newClientID++;
 
-        logger.info("connect");
+        if(!("displayid" in req.headers))
+        {
+            //No displayid passed! Get out of here! 
+            logger.error(`Client ${ws._socket.remoteAddress} tried to connect without passing displayID header. Terminating.`);
+            ws.terminate();
+        }
+
+        if (!("authtoken" in req.headers)) 
+        {
+            //No displayid passed! Get out of here! 
+            logger.error(`Client ${ws._socket.remoteAddress} tried to connect without passing any authorisation details. Terminating.`);
+            ws.terminate();
+        }
+
+        if(req.headers("authtoken") != settings.authorisationToken)
+        {
+            //No displayid passed! Get out of here! 
+            logger.error(`Client ${ws._socket.remoteAddress} failed authentication. Terminating.`);
+            ws.terminate();
+        }
     },
 
     onDisconnect(ws)

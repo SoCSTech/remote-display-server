@@ -3,5 +3,6 @@
     "pingInterval": 3000,
     "logging": {
         "level": "debug"
-    }
+    },
+    "authorisationToken": "password"
 }

@@ -4,6 +4,7 @@ const settings = require('./config/settings.json');
 //Import logging stuff
 const logger = require("winston");
 const logging = require("./src/utils/logging");
+const chalk = require("chalk");
 
 //Import web socket server
 const { WebSocketServer } = require('ws');
@@ -16,36 +17,35 @@ const { sendWelcomeMessage } = require('./src/utils/logging');
 //Import behaviour
 const carousel = require("./src/behaviours/carousel");
 
-//Initialise logging and send welcome message
-logging.initialise();
-logging.sendWelcomeMessage();
+
+//Send warnings if needed
+if (settings.authorisationToken == "password") 
+{
+    // console.clear();
+    console.log(chalk.red.bold("WARNING"))
+    console.log(chalk.red.bold("The specified authorisation token has not been changed. It is advised that you change this immediately for security purposes."));
+    console.log("");
+}
 
 
+function start()
+{
+    //Initialise logging and send welcome message
+    logging.initialise();
+    logging.sendWelcomeMessage();
 
+    //Make a new server
+    let wss = new WebSocketServer({ port: settings.hostPort });
+    logging.sendServerStartMessage(wss);
+    logging.setUpMessages(wss);
 
+    //Initialise ping & default keypresses
+    initPing(wss, defaultPingHandler);
+    initKeypresses(wss, defaultKeypressHandler);
 
-//Make a new server
-let wss = new WebSocketServer({ port: settings.hostPort });
-logging.sendServerStartMessage(wss);
-logging.setUpMessages(wss);
+    //Call init for carousel
+    carousel.initialise(wss);
+}
 
-//Initialise ping & default keypresses
-initPing(wss, defaultPingHandler);
-initKeypresses(wss, defaultKeypressHandler);
-
-
-//Call init for carousel
-carousel.initialise(wss);
-
-
-// const dataSendInterval = setInterval(function () 
-// {
-//     wss.clients.forEach(function (ws) 
-//     {
-//         ws.send(JSON.stringify
-//         ({
-//             type: "data",
-//             data: lastChar
-//         }));
-//     })
-// }, 500);
+//Start everything up
+start();

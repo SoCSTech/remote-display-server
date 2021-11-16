@@ -18,8 +18,11 @@
   },
   "homepage": "https://github.com/blewert/remote-display-server",
   "dependencies": {
+    "chalk": "^4.1.2",
     "crypto": "^1.0.1",
+    "enquirer": "^2.3.6",
     "keypress": "^0.2.1",
+    "simple-terminal-menu": "^2.0.0",
     "winston": "^3.3.3",
     "ws": "^8.2.3"
   }
