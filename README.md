@@ -31,3 +31,4 @@ If all of these are satisfied, a connection is made, otherwise, the client is im
 | `1.0.1`   | 16/11/21     | Working logger & basis for carousel system
 | `1.0.2`   | 16/11/21     | Added basic authentication
 | `1.0.3`   | 16/11/21     | Adds `displayID` identification
+| `1.0.4`   | 16/11/21     | Adds some operating modes for carousel system
