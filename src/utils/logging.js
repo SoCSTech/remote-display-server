@@ -39,9 +39,21 @@ const Logging =
     sendClientTerminatedMessage(ws, reason)
     {
         if(ws == undefined)
-            logger.debug(`[disconnect] Client disconnected (${ws._socket.remoteAddress}, ${reason})`);
+            logger.info(`[disconnect] Client disconnected (${ws._socket.remoteAddress}, ${reason})`);
         else
-            logger.debug(`[disconnect] Client disconnected (${reason})`);
+            logger.info(`[disconnect] Client disconnected (${reason})`);
+    },
+
+    sendServerStartMessage(wss)
+    {
+        const address = wss.address();
+
+        logger.info(`Started websocket server ${address.address}:${address.port} (${address.family})`);
+    },
+
+    sendServerCloseMessage(wss)
+    {
+        logger.info(`Closed websocket server`);
     },
 
     setUpMessages(wss)
@@ -49,7 +61,7 @@ const Logging =
         wss.on('connection', (ws) => 
         {
             //Call debug
-            logger.debug(`[connect] Client connected, ${wss.clients.size} in total`)
+            logger.info(`[connect] Client connected, ${wss.clients.size} in total`)
 
             //Call on ws close
             ws.on('close', (ws) => 
@@ -58,9 +70,12 @@ const Logging =
                 this.sendClientTerminatedMessage(ws, this.terminationReasons.closed)
 
                 //And then a little update
-                logger.debug(`[disconnect] ${wss.clients.size} total clients`);
+                logger.info(`[disconnect] ${wss.clients.size} total clients`);
             });
         });
+
+        //Hook close event
+        wss.on('close', (wss) => this.sendServerCloseMessage(wss));
     },
 
     sendWelcomeMessage()

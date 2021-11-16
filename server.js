@@ -1,6 +1,7 @@
 //Firstly import settings
 const settings = require('./config/settings.json'); 
 
+//Import logging stuff
 const logger = require("winston");
 const logging = require("./src/utils/logging");
 
@@ -20,6 +21,7 @@ logging.sendWelcomeMessage();
 var lastChar = " ";
 
 let wss = new WebSocketServer({ port: settings.hostPort });
+logging.sendServerStartMessage(wss);
 logging.setUpMessages(wss);
 
 initPing(wss, defaultPingHandler);
