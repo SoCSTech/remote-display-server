@@ -1,0 +1,25 @@
+[
+    {
+        "type": "text",
+        "payload": {
+            "title": "Slide 1",
+            "subtitle": "This is the first slide"
+        }
+    },
+
+    {
+        "type": "text",
+        "payload": {
+            "title": "Slide 2",
+            "subtitle": "This is the second slide"
+        }
+    },
+
+    {
+        "type": "text",
+        "payload": {
+            "title": "Slide 3",
+            "subtitle": "This is the third slide"
+        }
+    }
+]
