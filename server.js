@@ -2,15 +2,15 @@
 const settings = require('./config/settings.json'); 
 
 const logger = require("winston");
-const logging = require("./src/logging");
+const logging = require("./src/utils/logging");
 
 
 const { WebSocketServer } = require('ws');
 const crypto = require("crypto");
 
-const { initPing, defaultPingHandler } = require("./src/ping"); 
-const { initKeypresses, defaultKeypressHandler } = require('./src/keypresses');
-const { sendWelcomeMessage } = require('./src/logging');
+const { initPing, defaultPingHandler } = require("./src/utils/ping"); 
+const { initKeypresses, defaultKeypressHandler } = require('./src/utils/keypresses');
+const { sendWelcomeMessage } = require('./src/utils/logging');
 
 //Initialise logging and send welcome message
 logging.initialise();

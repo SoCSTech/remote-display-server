@@ -1,4 +1,4 @@
-const settings = require('../config/settings.json');
+const settings = require('../../config/settings.json');
 const logging = require('./logging');
 
 /**

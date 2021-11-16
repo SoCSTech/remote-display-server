@@ -1,6 +1,6 @@
 const logger = require("winston");
-const packageDetails = require("../package.json");
-const settings = require("../config/settings.json");
+const packageDetails = require("../../package.json");
+const settings = require("../../config/settings.json");
 
 const Logging = 
 {
