@@ -17,7 +17,7 @@ const carouselOperationModes = [
             //And send it to the display
             ws.send(JSON.stringify(data));
 
-            logger.debug(`[send] Sent slide ${randomID} to display ${ws.displayID}`);
+            // logger.debug(`[send] Sent slide ${randomID} to display ${ws.displayID}`);
         }
     },
     
@@ -31,7 +31,7 @@ const carouselOperationModes = [
             //And send it to the display
             ws.send(JSON.stringify(data));
 
-            logger.debug(`[send] Sent slide ${ctx.slideIndex} to display ${ws.displayID}`);
+            // logger.debug(`[send] Sent slide ${ctx.slideIndex} to display ${ws.displayID}`);
         }
     },
 
@@ -48,7 +48,7 @@ const carouselOperationModes = [
             //And send it to the display
             ws.send(JSON.stringify(data));
 
-            logger.debug(`[send] Sent slide ${thisClientIndex} to display ${ws.displayID}`);
+            // logger.debug(`[send] Sent slide ${thisClientIndex} to display ${ws.displayID}`);
         }
     }
 ]
@@ -80,7 +80,19 @@ module.exports =
         }
         
         //Otherwise display message 
-        logger.debug(`Initialised carousel in mode '${settings.carousel.operationMode}'`);
+        // logger.debug(`Initialised carousel in mode '${settings.carousel.operationMode}'`);
+    },
+
+    messageAndClose(ws, msg)
+    {
+        logger.error(msg);
+        ws.terminate();
+    },
+
+    isValidRequestType(type)
+    {
+        //Currently there is only one request type
+        return (type == "handshake");
     },
 
     onConnect(ws, req)
@@ -88,31 +100,60 @@ module.exports =
         //Set disconnect
         ws.on('close', ((ws) => this.onDisconnect(ws)).bind(this));
 
-        if(!("displayid" in req.headers))
-        {
-            //No displayid passed! Get out of here! 
-            logger.error(`Client ${ws._socket.remoteAddress} tried to connect without passing displayID header. Terminating.`);
-            ws.terminate();
-        }
 
-        if (!("authtoken" in req.headers)) 
-        {
-            //No authtoken passed! Get out of here! 
-            logger.error(`Client ${ws._socket.remoteAddress} tried to connect without passing any authorisation details. Terminating.`);
-            ws.terminate();
-        }
+        const ctx = this;
 
-        if(req.headers["authtoken"] != settings.authorisationToken)
+        ws.on('message', (msg) => 
         {
-            //Invalid authorisation token
-            logger.error(`Client ${ws._socket.remoteAddress} failed authentication. Terminating.`);
-            ws.terminate();
-        }
+            try
+            {
+                //Parse
+                request = JSON.parse(msg);
+
+                //Does it have a requestType?
+                if (!("requestType" in request))
+                    return ctx.messageAndClose(ws, `Error: Received message from ${ws._socket.remoteAddress} but no request type passed in payload. Terminating.`);
+
+                //Is it a valid request type?
+                if (!ctx.isValidRequestType(request.requestType))
+                    return ctx.messageAndClose(ws, `Error: Received unsupported request type '${request.requestType}' from ${ws._socket.remoteAddress}. Terminating.`);
+            }
+            catch(e)
+            {
+                logger.error(`An error occurred when receiving a message from ${ws._socket.remoteAddress}.`);
+                logger.error('Terminating connection.');
+
+                ws.terminate();
+            }
+        })
+        // if(!("displayid" in req.headers))
+        // {
+        //     //No displayid passed! Get out of here! 
+        //     logger.error(`Client ${ws._socket.remoteAddress} tried to connect without passing displayID header. Terminating.`);
+        //     ws.terminate();
+        // }
+
+        // if (!("authtoken" in req.headers)) 
+        // {
+        //     //No authtoken passed! Get out of here! 
+        //     logger.error(`Client ${ws._socket.remoteAddress} tried to connect without passing any authorisation details. Terminating.`);
+        //     ws.terminate();
+        // }
+
+        // if(req.headers["authtoken"] != settings.authorisationToken)
+        // {
+        //     //Invalid authorisation token
+        //     logger.error(`Client ${ws._socket.remoteAddress} failed authentication. Terminating.`);
+        //     ws.terminate();
+        // }
 
         //Check to see if displayid is valid
         //..
 
-        const displayIDStr = req.headers["displayid"];
+        // const displayIDStr = req.headers["displayid"];
+        // const displayID = parseInt(displayIDStr);
+
+        const displayIDStr = "5";
         const displayID = parseInt(displayIDStr);
 
         if(isNaN(displayID))
@@ -134,7 +175,7 @@ module.exports =
 
     onDisconnect(ws)
     {
-        logger.info("disconnect");
+        // logger.info("disconnect");
     },
 
     update()

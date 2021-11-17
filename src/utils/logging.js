@@ -29,12 +29,12 @@ const Logging =
 
     sendPingSentMessage(wss) 
     {
-        logger.debug(`[ping] Sent ping message to ${wss.clients.size} clients.`);
+        // logger.debug(`[ping] Sent ping message to ${wss.clients.size} clients.`);
     },
 
     sendPingReceivedMessage(ws)
     {
-        logger.debug(`[pong] Received from ${ws._socket.remoteAddress}`);
+        // logger.debug(`[pong] Received from ${ws._socket.remoteAddress}`);
     },
 
     sendClientTerminatedMessage(ws, reason)
