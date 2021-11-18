@@ -7,6 +7,6 @@
     "authorisationToken": "password",
     "carousel": {
         "operationMode": "synchronised",
-        "updateInterval": 500
+        "updateInterval": 5000
     }
 }

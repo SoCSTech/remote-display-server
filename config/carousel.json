@@ -1,25 +1,21 @@
 [
     {
-        "type": "text",
+        "type": "twitter",
         "payload": {
-            "title": "Slide 1",
-            "subtitle": "This is the first slide"
+            "title": "UoL SoCS Twitter",
+            "handle": "@UolCompSci",
+            "url": "http://twitter.com/UoLCompSci?ref_src=twsrc%5Etfw",
+            "avatar": "https://pbs.twimg.com/profile_images/1402561098084196352/KMoMSGgt_400x400.jpg"
         }
     },
 
     {
-        "type": "text",
+        "type": "twitter",
         "payload": {
-            "title": "Slide 2",
-            "subtitle": "This is the second slide"
-        }
-    },
-
-    {
-        "type": "text",
-        "payload": {
-            "title": "Slide 3",
-            "subtitle": "This is the third slide"
+            "title": "LCAS",
+            "handle": "@lcas_uol",
+            "url": "http://twitter.com/lcas_uol",
+            "avatar": "https://pbs.twimg.com/profile_images/529951172690321408/D6v-OACl_400x400.png"
         }
     }
 ]

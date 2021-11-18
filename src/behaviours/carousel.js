@@ -132,7 +132,7 @@ module.exports =
                     return ctx.messageAndClose(ws, `Error: Received message from ${ws._socket.remoteAddress} but no authentication passed in payload. Terminating.`);
 
                 //Is it a valid auth token?
-                if (request.payload.authToken != "sausages")
+                if (request.payload.authToken != settings.authorisationToken)
                     return ctx.messageAndClose(ws, `Error: Authentication token '${request.payload.authToken}' from ${ws._socket.remoteAddress} invalid. Terminating.`);
 
                 //Does it have a display ID? 
