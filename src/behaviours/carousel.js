@@ -95,6 +95,15 @@ module.exports =
         return (type == "handshake");
     },
 
+    sendSuccess(ws)
+    {
+        logger.info(`Successfully connected client ${ws._socket.remoteAddress}, display ID ${ws.displayID}.`);
+
+        ws.send(JSON.stringify({
+            status: "connected"
+        }));
+    },
+
     onConnect(ws, req)
     {
         //Set disconnect
@@ -117,10 +126,32 @@ module.exports =
                 //Is it a valid request type?
                 if (!ctx.isValidRequestType(request.requestType))
                     return ctx.messageAndClose(ws, `Error: Received unsupported request type '${request.requestType}' from ${ws._socket.remoteAddress}. Terminating.`);
+
+                //Does it have an auth token?
+                if (!("payload" in request) || !("authToken" in request.payload))
+                    return ctx.messageAndClose(ws, `Error: Received message from ${ws._socket.remoteAddress} but no authentication passed in payload. Terminating.`);
+
+                //Is it a valid auth token?
+                if (request.payload.authToken != "sausages")
+                    return ctx.messageAndClose(ws, `Error: Authentication token '${request.payload.authToken}' from ${ws._socket.remoteAddress} invalid. Terminating.`);
+
+                //Does it have a display ID? 
+                if (!("displayID" in request.payload))
+                    return ctx.messageAndClose(ws, `Error: Received message from ${ws._socket.remoteAddress} but no display ID passed in payload. Terminating.`);
+
+                //Is it a valid display ID?
+                //..
+
+                //And set displayID
+                ws.displayID = request.payload.displayID;
+
+                //Send success message
+                ctx.sendSuccess(ws);                
             }
             catch(e)
             {
                 logger.error(`An error occurred when receiving a message from ${ws._socket.remoteAddress}.`);
+                logger.error("" + e);
                 logger.error('Terminating connection.');
 
                 ws.terminate();
