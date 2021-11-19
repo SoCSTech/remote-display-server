@@ -10,12 +10,16 @@
     },
 
     {
-        "type": "twitter",
+        "type": "video",
         "payload": {
-            "title": "LCAS",
-            "handle": "@lcas_uol",
-            "url": "http://twitter.com/lcas_uol",
-            "avatar": "https://pbs.twimg.com/profile_images/529951172690321408/D6v-OACl_400x400.png"
+            "src": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+        }
+    },
+
+    {
+        "type": "website",
+        "payload": {
+            "url": "http://10.5.11.126:1201/all"
         }
     }
 ]

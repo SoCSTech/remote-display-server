@@ -109,7 +109,6 @@ module.exports =
         //Set disconnect
         ws.on('close', ((ws) => this.onDisconnect(ws)).bind(this));
 
-
         const ctx = this;
 
         ws.on('message', (msg) => 
@@ -140,7 +139,12 @@ module.exports =
                     return ctx.messageAndClose(ws, `Error: Received message from ${ws._socket.remoteAddress} but no display ID passed in payload. Terminating.`);
 
                 //Is it a valid display ID?
-                //..
+                if(isNaN(parseInt(request.payload.displayID)))
+                    return ctx.messageAndClose(ws, `Client ${ws._socket.remoteAddress} tried connecting with invalid displayID ${displayIDStr}. Must be an integer. Terminating.`);
+
+                //Is this display ID already in use?
+                if ([...ctx.wss.clients].some(x => x.displayID == request.payload.displayID))
+                    return ctx.messageAndClose(ws, `Client ${ws._socket.remoteAddress} tried connecting with displayID ${displayIDStr}, but it already exists. Terminating.`);
 
                 //And set displayID
                 ws.displayID = request.payload.displayID;
@@ -181,27 +185,27 @@ module.exports =
         //Check to see if displayid is valid
         //..
 
-        // const displayIDStr = req.headers["displayid"];
+        // const displayIDStr = ws.displayID;
         // const displayID = parseInt(displayIDStr);
 
-        const displayIDStr = "5";
-        const displayID = parseInt(displayIDStr);
+        // const displayIDStr = "5";
+        // const displayID = parseInt(displayIDStr);
 
-        if(isNaN(displayID))
-        {
-            //Invalid authorisation token
-            logger.error(`Client ${ws._socket.remoteAddress} tried connecting with invalid displayID ${displayIDStr}. Must be an integer. Terminating.`);
-            ws.terminate();
-        }
+        // if(isNaN(displayID))
+        // {
+        //     //Invalid authorisation token
+        //     logger.error(`Client ${ws._socket.remoteAddress} tried connecting with invalid displayID ${displayIDStr}. Must be an integer. Terminating.`);
+        //     ws.terminate();
+        // }
 
-        if ([...this.wss.clients].some(x => x.displayID == displayID))
-        {
-            //Invalid authorisation token
-            logger.error(`Client ${ws._socket.remoteAddress} tried connecting with displayID ${displayIDStr}, but it already exists. Terminating.`);
-            ws.terminate();
-        }
+        // if ([...this.wss.clients].some(x => x.displayID == displayID))
+        // {
+        //     //Invalid authorisation token
+        //     logger.error(`Client ${ws._socket.remoteAddress} tried connecting with displayID ${displayIDStr}, but it already exists. Terminating.`);
+        //     ws.terminate();
+        // }
 
-        ws.displayID = displayID;
+        // ws.displayID = displayID;
     },
 
     onDisconnect(ws)
