@@ -2,7 +2,6 @@
 # Remote display server
 This is a websocket-based remote display built in NodeJS. It is currently in development, and is generally unusable as of right now.
 
-
 ## Installing
 1) Clone the repo with `git clone https://github.com/blewert/remote-display-system`.
 2) Run `npm install`
@@ -32,3 +31,4 @@ If all of these are satisfied, a connection is made, otherwise, the client is im
 | `1.0.2`   | 16/11/21     | Added basic authentication
 | `1.0.3`   | 16/11/21     | Adds `displayID` identification
 | `1.0.4`   | 16/11/21     | Adds some operating modes for carousel system
+| `1.0.5`   | 19/11/21     | Full connection handshake & validation 

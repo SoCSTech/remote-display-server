@@ -1,6 +1,6 @@
 {
   "name": "remote-display-server",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A websocket-based server for remotely displaying content to web clients",
   "main": "server.js",
   "scripts": {
